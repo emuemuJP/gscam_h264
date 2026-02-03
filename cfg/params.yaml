@@ -1,0 +1,15 @@
+h264_camera_publisher:
+  ros__parameters:
+    camera_count: 6
+    device: ""
+    devices: ""
+    device_base: "/dev/video"
+    device_index: 0
+    width: 1920
+    height: 1280
+    fps: 30
+    bitrate: 8000000
+    iframeinterval: 30
+    io_mode: 2
+    use_pts_stamp: true
+    topic_prefix: "/cam"
