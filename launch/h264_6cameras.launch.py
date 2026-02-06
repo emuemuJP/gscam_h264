@@ -27,7 +27,7 @@ def _cam_node(cam_id):
             'control_rate': 0,
             'preset_level': 4,
             'maxperf_enable': True,
-            'iframeinterval': 5,
+            'iframeinterval': 2,
             'io_mode': 2,
             'use_pts_stamp': True,
             'topic_prefix': '/cam',
