@@ -71,6 +71,11 @@ private:
   int io_mode_;
   bool use_pts_stamp_;
   std::string topic_prefix_;
+  int profile_;         // H264 profile: 0=Baseline, 2=Main, 4=High
+  int control_rate_;    // 0=VBR, 1=CBR
+  int preset_level_;    // 1=UltraFast, 2=Fast, 3=Medium, 4=Slow
+  int peak_bitrate_;    // Peak bitrate for VBR mode (bps)
+  bool maxperf_enable_; // Enable max GPU encoder performance
 
   std::vector<std::unique_ptr<CameraPipeline>> cameras_;
 
@@ -105,14 +110,22 @@ H264CameraPublisher::Impl::Impl(rclcpp::Node * node)
   io_mode_ = node_->declare_parameter("io_mode", 2);
   use_pts_stamp_ = node_->declare_parameter("use_pts_stamp", true);
   topic_prefix_ = node_->declare_parameter("topic_prefix", std::string("/cam"));
+  profile_ = node_->declare_parameter("profile", 4);
+  control_rate_ = node_->declare_parameter("control_rate", 0);
+  preset_level_ = node_->declare_parameter("preset_level", 4);
+  peak_bitrate_ = node_->declare_parameter("peak_bitrate", 25000000);
+  maxperf_enable_ = node_->declare_parameter("maxperf_enable", true);
 
   RCLCPP_INFO(node_->get_logger(),
     "H264CameraPublisher: camera_count=%d, device='%s', devices='%s', "
     "device_base=%s, device_index=%d, %dx%d@%dfps, bitrate=%d, "
-    "iframeinterval=%d, io_mode=%d, use_pts_stamp=%s",
+    "peak_bitrate=%d, profile=%d, control_rate=%d, preset_level=%d, "
+    "maxperf_enable=%s, iframeinterval=%d, io_mode=%d, use_pts_stamp=%s",
     camera_count_, device_.c_str(), devices_.c_str(),
     device_base_.c_str(), device_index_, width_, height_, fps_,
-    bitrate_, iframeinterval_, io_mode_,
+    bitrate_, peak_bitrate_, profile_, control_rate_, preset_level_,
+    maxperf_enable_ ? "true" : "false",
+    iframeinterval_, io_mode_,
     use_pts_stamp_ ? "true" : "false");
 
   if (!gst_is_initialized()) {
@@ -243,6 +256,11 @@ std::string H264CameraPublisher::Impl::build_pipeline_string(
      << ",framerate=" << fps_ << "/1"
      << " ! nvv4l2h264enc"
      << " bitrate=" << bitrate_
+     << " peak-bitrate=" << peak_bitrate_
+     << " profile=" << profile_
+     << " control-rate=" << control_rate_
+     << " preset-level=" << preset_level_
+     << " maxperf-enable=" << (maxperf_enable_ ? "true" : "false")
      << " iframeinterval=" << iframeinterval_
      << " insert-sps-pps=true"
      << " ! h264parse config-interval=1"

@@ -8,8 +8,13 @@ h264_camera_publisher:
     width: 1920
     height: 1280
     fps: 30
-    bitrate: 8000000
-    iframeinterval: 30
+    bitrate: 30000000
+    peak_bitrate: 40000000
+    profile: 4              # 0=Baseline, 2=Main, 4=High
+    control_rate: 0         # 0=VBR, 1=CBR
+    preset_level: 4         # 1=UltraFast, 2=Fast, 3=Medium, 4=Slow
+    maxperf_enable: true
+    iframeinterval: 5
     io_mode: 2
     use_pts_stamp: true
     topic_prefix: "/cam"
